@@ -1,0 +1,14 @@
+development:
+  name: pin-notes
+  url: http://dev.notes.2010.mindpin.com/
+  master_url: http://dev.config-manager.2010.mindpin.com/
+
+test:
+  name: pin-notes
+  url: http://dev.notes.2010.mindpin.com/
+  master_url: http://dev.config-manager.2010.mindpin.com/
+
+production:
+  name: pin-notes
+  url: http://notes.2010.mindpin.com/
+  master_url: http://dev.config-manager.2010.mindpin.com/
