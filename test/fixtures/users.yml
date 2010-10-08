@@ -1,0 +1,40 @@
+songliang:
+  name: songliang
+  salt: 267256200.649032
+  hashed_password: <%=User.encrypted_password('123456','267256200.649032')%>
+  email: ben7th@sina.com
+
+lifei:
+  name: lifei
+  salt: 267256200.649032
+  hashed_password: <%=User.encrypted_password('123456','267256200.649032')%>
+  email: fushang318@163.com
+
+chengliwen:
+  name: chengliwen
+  salt: 267256200.649032
+  hashed_password: <%=User.encrypted_password('123456','267256200.649032')%>
+  email: qdclw1986@163.com
+
+lucy:
+  name: 路西
+  salt: 267256200.649032
+  hashed_password: <%=User.encrypted_password('123456','267256200.649032')%>
+  email: lucy@gmail.com
+
+dave:
+  name: dave
+  salt: 267256200.649032
+  hashed_password: <%=User.encrypted_password('123456','267256200.649032')%>
+  email: dave@gmail.com
+
+jim:
+  name: jim
+  salt: 267256200.649032
+  hashed_password: <%=User.encrypted_password('123456','267256200.649032')%>
+  email: jim@gmail.com
+
+repo_lifei:
+  id: 2147483000
+  name: lifei
+  email: fushang318@repo.com
