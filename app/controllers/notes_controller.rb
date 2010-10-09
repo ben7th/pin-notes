@@ -28,6 +28,11 @@ class NotesController < ApplicationController
     redirect_to show_note_path(:note_id=>@note.id)
   end
 
+  def destroy
+    @note.destroy
+    redirect_to "/"
+  end
+
   def new_file
   end
 

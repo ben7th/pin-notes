@@ -3,6 +3,7 @@
 .grid_13.push_1
   -if params[:commit_id] == "master" || params[:commit_id] == commit_ids.first
     =link_to "编辑",edit_note_path(:note_id=>@note.id)
+    =link_to "删除",destroy_note_path(:note_id=>@note.id),:method=>:delete,:confirm=>"确定删除吗？"
   %div
     -repo.text_hash(params[:commit_id]).each do |name,text|
       =name
