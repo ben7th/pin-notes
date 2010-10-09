@@ -1,6 +1,10 @@
 class Note < ActiveRecord::Base
   belongs_to :user
 
+  def title
+    "note:#{self.id}"
+  end
+
   def repo
     NoteRepository.find(:user_id=>user_id,:note_id=>id)
   end

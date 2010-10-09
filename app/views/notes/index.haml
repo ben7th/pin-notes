@@ -1,0 +1,4 @@
+-current_user.notes.each do |note|
+  %div
+    =note.title
+    =note.repo.text_hash["#{NoteRepository::NOTE_FILE_PREFIX}1"]

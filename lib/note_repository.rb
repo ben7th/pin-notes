@@ -1,5 +1,9 @@
 class NoteRepository
-  REPO_BASE_PATH = YAML.load(CoreService.project("pin-notes").settings)[:note_repo_path]
+  if RAILS_ENV != "test"
+    REPO_BASE_PATH = YAML.load(CoreService.project("pin-notes").settings)[:note_repo_path]
+  else
+    REPO_BASE_PATH = "/root/mindpin_base/note_repo_test"
+  end
 
   NOTE_FILE_PREFIX = "notefile_"
   
@@ -38,20 +42,20 @@ class NoteRepository
   # 为新的文本片段指定编号，并转换成 HASH的形式
   def convert_new_texts_to_hash(texts)
     count = notefile_count
-    text_hashs = []
+    text_hash = {}
     texts.each_with_index do |text,index|
-      text_hashs << {:name=>"#{NOTE_FILE_PREFIX}#{count + index + 1}",:text=>text}
+      text_hash["#{NOTE_FILE_PREFIX}#{count + index + 1}"] = text
     end
-    text_hashs
+    text_hash
   end
 
   # 把 文本片段 写入文件
-  def create_or_edit_notefiles(text_hashs)
-    text_hashs.each do |text_hash|
+  def create_or_edit_notefiles(_text_hash)
+    _text_hash.each do |name,text|
       # 根据 text 生成文件
-      absolute_file_path = File.join(path,text_hash[:name])
+      absolute_file_path = File.join(path,name)
       File.open(absolute_file_path,"w") do |f|
-        f << text_hash[:text]
+        f << text
       end
     end
   end
@@ -62,20 +66,20 @@ class NoteRepository
     # 把 text_or_text_array 转换成数组
     texts = text_or_text_array.instance_of?(Array) ? text_or_text_array : [text_or_text_array]
     # 为新的文本片段指定编号，并转换成 HASH的形式
-    _text_hashs = convert_new_texts_to_hash(texts)
-    edit_notefiles(_text_hashs)
+    _text_hash = convert_new_texts_to_hash(texts)
+    edit_notefiles(_text_hash)
   end
 
   # 编辑文本片段
-  # text_hashs 格式
-  # [{:name=>"notefile_1",:text=>"xx"},{:name=>"notefile_2",:text=>"yy"}..]
-  def edit_notefiles(_text_hashs)
+  # text_hash 格式
+  # {"notefile_1"=>"xx","notefile_2"=>"yy"...}
+  def edit_notefiles(_text_hash)
     # 设置提交者
     set_creator_as_commiter
     # 把 文本片段 写入文件
-    create_or_edit_notefiles(_text_hashs)
+    create_or_edit_notefiles(_text_hash)
     # 提交到版本库
-    notefile_names = _text_hashs.map{|text_hash|text_hash[:name]}
+    notefile_names = _text_hash.keys
     @repo.add(notefile_names)
     @repo.commit_index("##")
   end
@@ -92,14 +96,16 @@ class NoteRepository
 
   # 得到所有的版本号,新版本号在数组的前面
   def commit_ids
-    @repo.commits.map{|commit|commit.id}.reverse
+    @repo.commits.map{|commit|commit.id}
   end
 
   # 得到某一个版本下的 所有 文本片段
-  def text_hashs(commit_id = "master")
+  def text_hash(commit_id = "master")
+    hash = {}
     _notefile_blob(commit_id).map do |blob|
-      {:name=>blob.name,:text=>blob.data}
+      hash[blob.name] = blob.data
     end
+    hash
   end
 
   # 获取文件片段的个数

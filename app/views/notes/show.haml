@@ -1,0 +1,16 @@
+-repo = @note.repo
+-commit_ids = repo.commit_ids
+.grid_13.push_1
+  -if params[:commit_id] == "master" || params[:commit_id] == commit_ids.first
+    =link_to "编辑",edit_note_path(:note_id=>@note.id)
+  %div
+    -repo.text_hash(params[:commit_id]).each do |name,text|
+      =name
+      =text
+
+.grid_8.push_1
+  .top-bar.clearfix
+    .fleft.font14.bold 版本列表
+  %div
+    -commit_ids.each do |id|
+      =link_to id,show_note_path(:note_id=>@note.id,:commit_id=>id)

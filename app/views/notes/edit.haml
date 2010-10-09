@@ -1,0 +1,14 @@
+-repo = @note.repo
+.grid_13.push_1
+  -form_tag update_note_path,:method =>:put do
+    -repo.text_hash.each do |name,text|
+      =render :partial=>"notes/parts/notefile_form",:locals=>{:name=>name,:text=>text}
+    %div (暂留增加文件按钮)
+    =submit_tag "保存"
+
+.grid_8.push_1
+  .top-bar.clearfix
+    .fleft.font14.bold 版本列表
+  %div
+    -repo.commit_ids.each do |id|
+      =link_to id,show_note_path(:note_id=>@note.id,:commit_id=>id)
