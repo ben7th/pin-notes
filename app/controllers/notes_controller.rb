@@ -34,6 +34,9 @@ class NotesController < ApplicationController
   end
 
   def new_file
+    str = @template.render :partial=>"notes/parts/notefile_form",
+      :locals=>{:name=>"#{NoteRepository::NOTE_FILE_PREFIX}#{params[:order]}",:text=>""}
+    render :text=>str
   end
 
 end

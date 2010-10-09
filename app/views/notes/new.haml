@@ -1,7 +1,8 @@
 .grid_13.push_1
-  -form_tag create_note_path,:method =>:post do
-    =render :partial=>"notes/parts/notefile_form",:locals=>{:name=>"#{NoteRepository::NOTE_FILE_PREFIX}1",:text=>""}
-    .add_new_notefile (暂留增加文件按钮)
+  -form_tag create_note_path,:method =>:post,:id=>"note_form" do
+    .notefiles
+      =render :partial=>"notes/parts/notefile_form",:locals=>{:name=>"#{NoteRepository::NOTE_FILE_PREFIX}1",:text=>""}
+    =link_to "增加文本片段",'#',:class=>"new_notefile"
     =submit_tag "创建 Note"
 
 .grid_8.push_1
@@ -10,3 +11,6 @@
   %div
     -current_user.notes.each do |note|
       %div=link_to note.title,show_note_path(:note_id=>note.id)
+
+-content_for :javascripts do
+  = javascript_include_tag 'views/notefile'
