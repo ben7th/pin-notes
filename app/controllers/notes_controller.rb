@@ -15,7 +15,7 @@ class NotesController < ApplicationController
   end
 
   def create
-    note = current_user.notes.create
+    note = current_user.notes.create(params[:note])
     note.repo.replace_notefiles(params[:notefile])
     redirect_to show_note_path(:note_id=>note.id)
   end
@@ -24,6 +24,8 @@ class NotesController < ApplicationController
   end
 
   def update
+    @note.update_attributes(params[:note])
+    @note.save
     @note.repo.replace_notefiles(params[:notefile])
     redirect_to show_note_path(:note_id=>@note.id)
   end

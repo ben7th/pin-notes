@@ -3,6 +3,8 @@
 -has_delete_button = text_hash.keys.count != 1
 .grid_13.push_1
   -form_tag update_note_path,:method =>:put,:id=>"note_form" do
+    %div 备注
+    =text_area_tag "note[description]",@note.description
     .notefiles
       -text_hash.each do |name,text|
         =render :partial=>"notes/parts/notefile_form",:locals=>{:name=>name,:text=>text,:has_delete_button=>has_delete_button}
