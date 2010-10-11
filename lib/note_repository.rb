@@ -39,14 +39,35 @@ class NoteRepository
     @repo.config['user.email'] = user.email
   end
 
-  # 为新的文本片段指定编号，并转换成 HASH的形式
-  def convert_new_texts_to_hash(texts)
-    count = notefile_count
-    text_hash = {}
-    texts.each_with_index do |text,index|
-      text_hash["#{NOTE_FILE_PREFIX}#{count + index + 1}"] = text
+  # 编辑文本片段
+  # _text_hash 格式
+  # {"notefile_1"=>"xx","notefile_2"=>"yy"...}
+  def replace_notefiles(_text_hash)
+    # 设置提交者
+    set_creator_as_commiter
+    # 对比 self.text_hash 和 _text_hash 找到需要写入的 文本片段
+    write_hash = find_text_hash_of_need_to_write(_text_hash)
+    # 把 文本片段 写入文件
+    create_or_edit_notefiles(write_hash)
+    # 对比 self.text_hash 和 _text_hash 找到要删除的文件
+    delete_names = self.text_hash.keys - _text_hash.keys
+    # 删除 文本片段
+    delete_notefiles(delete_names)
+    # 提交到版本库
+    @repo.commit_index("##")
+  end
+
+  # 对比 self.text_hash 和 new_hash 找到需要写入的 文本片段
+  def find_text_hash_of_need_to_write(new_hash)
+    old_hash = self.text_hash
+    need_write_hash = {}
+    # 对比 self.text_hash 和 _text_hash 找到要编辑的文本 和 新增的文本
+    new_hash.each do |name,text|
+      is_new = old_hash[name].blank?
+      is_edit = (old_hash[name] != text)
+      need_write_hash[name] = text if is_new || is_edit
     end
-    text_hash
+    need_write_hash
   end
 
   # 把 文本片段 写入文件
@@ -58,40 +79,25 @@ class NoteRepository
         f << text
       end
     end
+    @repo.add(_text_hash.keys)
   end
 
-  # 增加文本片段
-  # text_or_text_array 可以是 字符串，或者字符串数组
-  def add_notefiles(text_or_text_array)
-    # 把 text_or_text_array 转换成数组
-    texts = text_or_text_array.instance_of?(Array) ? text_or_text_array : [text_or_text_array]
-    # 为新的文本片段指定编号，并转换成 HASH的形式
-    _text_hash = convert_new_texts_to_hash(texts)
-    edit_notefiles(_text_hash)
+  # 删除文件
+  def delete_notefiles(delete_names)
+    delete_names.each do |notefile_name|
+      absolute_file_path = File.join(path,notefile_name)
+      raise "要删除的文件不存在" if !File.exist?(absolute_file_path)
+      @repo.remove(notefile_name)
+    end
   end
 
-  # 编辑文本片段
-  # text_hash 格式
-  # {"notefile_1"=>"xx","notefile_2"=>"yy"...}
-  def edit_notefiles(_text_hash)
-    # 设置提交者
-    set_creator_as_commiter
-    # 把 文本片段 写入文件
-    create_or_edit_notefiles(_text_hash)
-    # 提交到版本库
-    notefile_names = _text_hash.keys
-    @repo.add(notefile_names)
-    @repo.commit_index("##")
-  end
-
-  # 删除文本片段
-  def delete_notefile(notefile_name)
-    # 设置提交者
-    set_creator_as_commiter
-    absolute_file_path = File.join(path,notefile_name)
-    raise "要删除的文件不存在" if !File.exist?(absolute_file_path)
-    @repo.remove(notefile_name)
-    @repo.commit_index("##")
+  # 找到当前最大的编号
+  def current_max_id
+    ids = _notefile_blob("master").map do |blob|
+      blob.name.sub(NOTE_FILE_PREFIX,"").to_i
+    end
+    ids << 0
+    ids.max
   end
 
   # 得到所有的版本号,新版本号在数组的前面

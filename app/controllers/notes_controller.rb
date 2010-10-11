@@ -16,7 +16,7 @@ class NotesController < ApplicationController
 
   def create
     note = current_user.notes.create
-    note.repo.edit_notefiles(params[:notefile])
+    note.repo.replace_notefiles(params[:notefile])
     redirect_to show_note_path(:note_id=>note.id)
   end
 
@@ -24,7 +24,7 @@ class NotesController < ApplicationController
   end
 
   def update
-    @note.repo.edit_notefiles(params[:notefile])
+    @note.repo.replace_notefiles(params[:notefile])
     redirect_to show_note_path(:note_id=>@note.id)
   end
 
@@ -35,7 +35,7 @@ class NotesController < ApplicationController
 
   def new_file
     str = @template.render :partial=>"notes/parts/notefile_form",
-      :locals=>{:name=>"#{NoteRepository::NOTE_FILE_PREFIX}#{params[:order]}",:text=>""}
+      :locals=>{:name=>"#{NoteRepository::NOTE_FILE_PREFIX}#{params[:next_id]}",:text=>""}
     render :text=>str
   end
 

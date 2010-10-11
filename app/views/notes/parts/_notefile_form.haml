@@ -1,4 +1,9 @@
 -field_name = "notefile[#{name}]"
-.notefile
+-id = name.sub(NoteRepository::NOTE_FILE_PREFIX,"")
+.notefile{:"data-notefile_id"=>id}
   .name= name
-  =text_area_tag field_name,text
+  .notefile_form
+    =text_area_tag field_name,text
+  -if has_delete_button ||= false
+    .notefile_delete_tip.hide 准备删除
+    =link_to "删除文本片段",'#',:class=>"delete_notefile"
